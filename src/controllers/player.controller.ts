@@ -12,9 +12,18 @@ interface CreatePlayerRequest {
   Body: CreatePlayerInput;
 }
 
+interface GetPlayersQuery {
+  country?: string;
+}
+
 export function createPlayerController(playerService: PlayerService) {
-  async function getPlayers(_request: FastifyRequest, reply: FastifyReply) {
-    const players = await playerService.getAllPlayers();
+  async function getPlayers(
+    request: FastifyRequest<{ Querystring: GetPlayersQuery }>,
+    reply: FastifyReply
+  ) {
+    const players = await playerService.getAllPlayers({
+      country: request.query.country
+    });
 
     return reply.status(200).send(players);
   }

@@ -8,13 +8,25 @@ type PlayerDataService = ReturnType<typeof createPlayerDataService>;
 
 export type PlayerService = ReturnType<typeof createPlayerService>;
 
+export interface GetPlayersOptions {
+  country?: string | undefined;
+}
+
 export function createPlayerService(
   playerDataService: PlayerDataService
 ) {
-  async function getAllPlayers(): Promise<Player[]> {
+  async function getAllPlayers(
+    options: GetPlayersOptions = {}
+  ): Promise<Player[]> {
     const players = await playerDataService.getPlayers();
 
-    return players.toSorted(
+    const filteredPlayers = options.country
+      ? players.filter(
+          (player) => player.country.code === options.country
+        )
+      : players;
+
+    return filteredPlayers.toSorted(
       (a, b) => a.data.rank - b.data.rank
     );
   }

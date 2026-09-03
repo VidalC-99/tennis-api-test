@@ -1,3 +1,16 @@
+export const getPlayersSchema = {
+  querystring: {
+    type: 'object',
+    properties: {
+      country: {
+        type: 'string',
+        minLength: 3,
+        maxLength: 3
+      }
+    }
+  }
+} as const;
+
 export const createPlayerSchema = {
   body: {
     type: 'object',
