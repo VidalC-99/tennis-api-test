@@ -3,6 +3,8 @@ import { createPlayerController } from '../controllers/player.controller.js';
 import type { PlayerService } from '../services/player.service.js';
 import {
   createPlayerSchema,
+  getPlayerByIdSchema,
+  getPlayerStatsSchema,
   getPlayersSchema
 } from './schemas/player.schema.js';
 
@@ -24,9 +26,21 @@ export async function playerRoutes(
     playerController.getPlayers
   );
 
-  app.get('/players/stats', playerController.getPlayerStats);
+  app.get(
+    '/players/stats',
+    {
+      schema: getPlayerStatsSchema
+    },
+    playerController.getPlayerStats
+  );
 
-  app.get('/players/:id', playerController.getPlayerById);
+  app.get(
+    '/players/:id',
+    {
+      schema: getPlayerByIdSchema
+    },
+    playerController.getPlayerById
+  );
 
   app.post(
     '/players',
