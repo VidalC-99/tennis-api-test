@@ -1,24 +1,50 @@
-import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
-import type { Player } from "../models/player.js";
-
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
+import type { Player } from '../models/player.js';
+import type { CreatePlayerInput } from '../models/player.js'; 
 interface PlayersData {
-    players: Player[]
+  players: Player[];
 }
 
-let players: Player[] | null = null
+export function createPlayerDataService() {
+  let players: Player[] | null = null;
 
-export async function getPlayers(): Promise<Player[]> {
-    
-    if (players !== null){
-        return players
+  async function loadPlayers(): Promise<Player[]> {
+    const filePath = resolve(process.cwd(), 'data/headtohead.json');
+    const file = await readFile(filePath, 'utf-8');
+    const data: PlayersData = JSON.parse(file);
+
+    return data.players;
+  }
+
+  async function getPlayers(): Promise<Player[]> {
+    if (players === null) {
+      players = await loadPlayers();
     }
 
-    const filePath = resolve(process.cwd(), 'data/headtohead.json')
-    const file = await readFile(filePath, 'utf-8')
-    const data: PlayersData = JSON.parse(file)
+    return players;
+  }
 
-    players = data.players
+  async function addPlayer(
+    playerInput: CreatePlayerInput
+  ): Promise<Player> {
+    const currentPlayers = await getPlayers();
 
-    return players
+    const nextId =
+      Math.max(...currentPlayers.map((player) => player.id), 0) + 1;
+
+    const player: Player = {
+      id: nextId,
+      ...playerInput
+    };
+
+    currentPlayers.push(player);
+
+    return player;
+  }
+
+  return {
+    getPlayers,
+    addPlayer
+  };
 }

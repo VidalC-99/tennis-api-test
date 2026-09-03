@@ -1,21 +1,46 @@
-import { PlayerNotFoundError } from '../errors/player-not-found.error.js';
 import type { Player } from '../models/player.js';
-import { getPlayers } from './player-data.service.js';
+import type { CreatePlayerInput } from '../models/player.js';
+import { PlayerNotFoundError } from '../errors/player-not-found.error.js';
+import type { createPlayerDataService } from './player-data.service.js';
 
-export async function getAllPlayers(): Promise<Player[]> {
-  const players = await getPlayers();
+type PlayerDataService = ReturnType<typeof createPlayerDataService>;
 
-  return players.toSorted((a, b) => a.data.rank - b.data.rank);
-}
+export type PlayerService = ReturnType<typeof createPlayerService>;
 
-export async function getPlayerById(playerId: number): Promise<Player> {
-  const players = await getPlayers();
+export function createPlayerService(
+  playerDataService: PlayerDataService
+) {
+  async function getAllPlayers(): Promise<Player[]> {
+    const players = await playerDataService.getPlayers();
 
-  const player = players.find((player) => player.id === playerId);
-
-  if (!player) {
-    throw new PlayerNotFoundError(playerId);
+    return players.toSorted(
+      (a, b) => a.data.rank - b.data.rank
+    );
   }
 
-  return player;
+  async function getPlayerById(playerId: number): Promise<Player> {
+    const players = await playerDataService.getPlayers();
+
+    const player = players.find(
+      (player) => player.id === playerId
+    );
+
+    if (!player) {
+      throw new PlayerNotFoundError(playerId);
+    }
+
+    return player;
+  }
+
+  async function createPlayer(
+    playerInput: CreatePlayerInput
+  ): Promise<Player> {
+    return playerDataService.addPlayer(playerInput);
+  }
+
+  return {
+    getAllPlayers,
+    getPlayerById,
+    createPlayer
+  };
 }

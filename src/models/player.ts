@@ -18,3 +18,5 @@ export interface Player {
     last: number[];
   };
 }
+
+export type CreatePlayerInput = Omit<Player, 'id'>;

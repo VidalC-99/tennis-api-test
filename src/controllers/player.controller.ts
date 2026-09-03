@@ -1,27 +1,47 @@
-import type { FastifyReply, FastifyRequest } from "fastify";
-import { getAllPlayers, getPlayerById } from "../services/player.service.js";
+import type { FastifyReply, FastifyRequest } from 'fastify';
+import type { PlayerService } from '../services/player.service.js';
+import type { CreatePlayerInput } from '../models/player.js';
 
 interface GetPlayerByIdRequest {
-    Params: {
-        id: string
-    }
+  Params: {
+    id: string;
+  };
 }
 
-export async function getPlayersController(_request: FastifyRequest, reply: FastifyReply) {
-    
-    const player = await getAllPlayers()
-
-    return reply.send(player).status(200)
+interface CreatePlayerRequest {
+  Body: CreatePlayerInput;
 }
 
+export function createPlayerController(playerService: PlayerService) {
+  async function getPlayers(_request: FastifyRequest, reply: FastifyReply) {
+    const players = await playerService.getAllPlayers();
 
-export async function getPlayerByIdController(
-  request: FastifyRequest<GetPlayerByIdRequest>,
-  reply: FastifyReply
-) {
-  const playerId = Number(request.params.id);
+    return reply.status(200).send(players);
+  }
 
-  const player = await getPlayerById(playerId);
+  async function getPlayerById(
+    request: FastifyRequest<GetPlayerByIdRequest>,
+    reply: FastifyReply
+  ) {
+    const playerId = Number(request.params.id);
 
-  return reply.status(200).send(player);
+    const player = await playerService.getPlayerById(playerId);
+
+    return reply.status(200).send(player);
+  }
+
+  async function createPlayer(
+    request: FastifyRequest<CreatePlayerRequest>,
+    reply: FastifyReply
+  ) {
+    const player = await playerService.createPlayer(request.body);
+
+    return reply.status(201).send(player);
+  }
+
+  return {
+    getPlayers,
+    getPlayerById,
+    createPlayer
+  };
 }

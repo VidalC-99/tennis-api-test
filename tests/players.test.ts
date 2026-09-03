@@ -63,4 +63,87 @@ it('should return 404 when the player does not exist', async () => {
         message: 'Player with id 999 was not found'
     });
 });
+
+it('should create a player', async () => {
+  app = buildApp();
+
+  const newPlayer = {
+    firstname: 'Roger',
+    lastname: 'Federer',
+    shortname: 'R.FED',
+    sex: 'M',
+    country: {
+      picture: 'https://example.com/switzerland.png',
+      code: 'SUI'
+    },
+    picture: 'https://example.com/federer.png',
+    data: {
+      rank: 3,
+      points: 2500,
+      weight: 85000,
+      height: 185,
+      age: 37,
+      last: [1, 1, 1, 1, 0]
+    }
+  };
+
+  const response = await app.inject({
+    method: 'POST',
+    url: '/players',
+    payload: newPlayer
+  });
+
+  expect(response.statusCode).toBe(201);
+
+  expect(response.json()).toMatchObject({
+    id: 103,
+    firstname: 'Roger',
+    lastname: 'Federer'
+  });
+});
+
+it('should reject an invalid player', async () => {
+  app = buildApp();
+
+  const response = await app.inject({
+    method: 'POST',
+    url: '/players',
+    payload: {
+      firstname: 'Roger'
+    }
+  });
+
+  expect(response.statusCode).toBe(400);
+});
+
+it('should reject unknown properties', async () => {
+  app = buildApp();
+
+  const response = await app.inject({
+    method: 'POST',
+    url: '/players',
+    payload: {
+      firstname: 'Roger',
+      lastname: 'Federer',
+      shortname: 'R.FED',
+      sex: 'M',
+      country: {
+        picture: 'https://example.com/switzerland.png',
+        code: 'SUI'
+      },
+      picture: 'https://example.com/federer.png',
+      data: {
+        rank: 3,
+        points: 2500,
+        weight: 85000,
+        height: 185,
+        age: 37,
+        last: [1, 1, 1, 1, 0]
+      },
+      unexpectedField: 'should fail'
+    }
+  });
+
+  expect(response.statusCode).toBe(400);
+});
 });
