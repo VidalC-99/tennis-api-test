@@ -15,6 +15,8 @@ export async function playerRoutes(
 
   app.get('/players', playerController.getPlayers);
 
+  app.get('/players/stats', playerController.getPlayerStats);
+
   app.get('/players/:id', playerController.getPlayerById);
 
   app.post(

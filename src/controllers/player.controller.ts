@@ -39,9 +39,16 @@ export function createPlayerController(playerService: PlayerService) {
     return reply.status(201).send(player);
   }
 
+  async function getPlayerStats(_request: FastifyRequest, reply: FastifyReply) {
+    const stats = await playerService.getPlayerStats();
+
+    return reply.status(200).send(stats);
+  }
+
   return {
     getPlayers,
     getPlayerById,
-    createPlayer
+    createPlayer,
+    getPlayerStats
   };
 }

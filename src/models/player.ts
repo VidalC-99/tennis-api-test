@@ -20,3 +20,13 @@ export interface Player {
 }
 
 export type CreatePlayerInput = Omit<Player, 'id'>;
+
+
+export interface PlayerStats {
+  bestCountry: {
+    code: string;
+    winRatio: number;
+  };
+  averageIMC: number;
+  medianHeight: number;
+}

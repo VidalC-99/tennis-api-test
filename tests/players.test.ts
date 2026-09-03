@@ -146,4 +146,25 @@ it('should reject unknown properties', async () => {
 
   expect(response.statusCode).toBe(400);
 });
+
+it('should return player statistics', async () => {
+  app = buildApp();
+
+  const response = await app.inject({
+    method: 'GET',
+    url: '/players/stats'
+  });
+
+  expect(response.statusCode).toBe(200);
+
+  const stats = response.json();
+
+  expect(stats.bestCountry).toEqual({
+    code: 'SRB',
+    winRatio: 1
+  });
+
+  expect(stats.medianHeight).toBe(185);
+  expect(stats.averageIMC).toBeCloseTo(23.36, 2);
+});
 });
